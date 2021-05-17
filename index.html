@@ -112,6 +112,7 @@
 	</style>
 
 	<div class="content">
+		
 		<table style="width: 100%;">
 			<thead class="thead">
 				<tr>
@@ -123,13 +124,18 @@
 			<tbody class="tbody">
 			</tbody>
 		</table>
+		<div id="scanNum">
+			扫描次数:
+		</div>
 		<div id="blockDataout">
 		</div>
+
 	</div>
 	<script>
 		var oldArr = [], timel, resultHtml = "", butText = '扫大哥', dataType, index = -1;
 		var flag = false;
 		var interval;
+		var scanNum = 0;
 		function getList() {
 			let listData = [{ name: '0.6大哥', address: '0x0cec4474E6B78e2703dcaAe57De283F96a34614e' }, { name: '100%大哥', address: '0x3499fa28c6d4bd9fdcd3ef8cf915c297b66c2df0' }];
 			let html = [];
@@ -146,6 +152,8 @@
 				let dataId = $(this).attr('data-id');
 				dataType = $(this).parent().prev().attr('data-type');
 				$('.td-but').text('扫大哥');
+				scanNum = 0;
+				scanNumSetting();
 				if (index == $(this).parent().parent().index() && flag) {
 					flag = false;
 					$(this).text('扫大哥');
@@ -224,6 +232,9 @@
 							})
 						}
 					}
+
+					scanNum += 1;
+					scanNumSetting();
 				}
 			})
 		}
@@ -251,6 +262,12 @@
 			var audio = document.getElementById("bgMusic");
 			//播放
 			audio.play();
+		}
+
+
+		function scanNumSetting(){
+			
+			document.getElementById('scanNum').innerHTML = '扫描次数:' + scanNum;
 		}
 	</script>
 </body>
