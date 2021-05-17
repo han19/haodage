@@ -136,6 +136,7 @@
 		var flag = false;
 		var interval;
 		var scanNum = 0;
+		var pageHidden = false;
 		function getList() {
 			let listData = [{ name: '0.6大哥', address: '0x0cec4474E6B78e2703dcaAe57De283F96a34614e' }, { name: '100%大哥', address: '0x3499fa28c6d4bd9fdcd3ef8cf915c297b66c2df0' }];
 			let html = [];
@@ -219,14 +220,16 @@
 								resultHtml += `<div class="swapItem" style="color: ${bgColor}; line-height: 40px;margin-bottom:5px;border: 1px solid ${bgColor};padding: 5px 0;radius: 5px; text-indent: 10px;" data-id="${d}">${i}:${changeDic[i]}</div>`;
 							}
 							$(`#blockDataout`).html(resultHtml); //添加结果
-							if(changeDic.length > 0){
+							console.log(changeDic);
+							if(!isEmptyObject(changeDic)){
 								playDing();
-								titleRollingStart();
+								if(pageHidden){
+									titleRollingStart();
+								}
 							}
 							oldArr = data.result;
 							// 跳转
 							$('#blockDataout').on('click', '.swapItem', function () {
-								titleRollingStop();
 								let dataId = $(this).attr('data-id')
 								window.open(`https://etherscan.io/address/${dataId}`)
 							})
@@ -239,6 +242,15 @@
 			})
 		}
 
+
+		document.addEventListener('visibilitychange',function(){
+  			var isHidden = document.hidden;
+			pageHidden = isHidden;
+   			if(!isHidden){
+				titleRollingStop();
+			}
+  		});
+
 		function titleRollingStart(){
 			document.title = '大哥有操作';//截取字符重新赋值给title
 			timel = setInterval(function () {
@@ -250,7 +262,7 @@
 				titleArr.push(titleArr.shift());
 				//连接为字符串
 				document.title = titleArr.join('');
-			}, 100);
+			}, 50);
 		}
 
 		function titleRollingStop(){
@@ -258,6 +270,12 @@
 			clearInterval(timel);
 		}
 
+		function isEmptyObject(obj) {
+  			for (var key in obj) {
+    			return false;
+  			}
+  			return true;
+		}
 		function playDing(){
 			var audio = document.getElementById("bgMusic");
 			//播放
