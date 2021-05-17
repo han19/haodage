@@ -153,7 +153,7 @@
 					document.title = '扫大哥';//截取字符重新赋值给title
 				} else {
 					getJson(dataId);
-					oldArr = [];
+					oldArr.splice(0,oldArr.length);
 					interval = setInterval(function () { getJson(dataId); }, 4000);
 					index = $(this).parent().parent().index();
 					flag = true;
