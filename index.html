@@ -77,6 +77,7 @@
 </head>
 
 <body>
+	<audio src="ding.wav" preload="auto" id="bgMusic"></audio>
 	<style>
 		.thead th {
 			word-break: break-word;
@@ -123,7 +124,6 @@
 			</tbody>
 		</table>
 		<div id="blockDataout">
-			
 		</div>
 	</div>
 	<script>
@@ -146,29 +146,22 @@
 				dataType = $(this).parent().prev().attr('data-type');
 				$('.td-but').text('扫大哥');
 				if (index == $(this).parent().parent().index() && flag) {
-					clearInterval(interval);
 					flag = false;
 					$(this).text('扫大哥');
+					clearInterval(interval);
 					clearInterval(timel);
 					document.title = '扫大哥';//截取字符重新赋值给title
 				} else {
-					getJson(dataId);
-					oldArr.splice(0,oldArr.length);
-					interval = setInterval(function () { getJson(dataId); }, 4000);
 					index = $(this).parent().parent().index();
 					flag = true;
+					oldArr.splice(0,oldArr.length);
+					console.log(oldArr);
+					getJson(dataId);
+					clearInterval(interval);
+					clearInterval(timel);
+					$(`#blockDataout`).html(''); //添加结果
+					interval = setInterval(function () { getJson(dataId); }, 4000);
 					$(this).text('停止');
-					document.title = '新消息通知';//截取字符重新赋值给title
-					timel = setInterval(function () {
-						//获得页面标题,是string类型
-						var oldTitle = document.title;
-						//转换为数组类型
-						var titleArr = oldTitle.split('');
-						//使标题的字符产生位置的变化
-						titleArr.push(titleArr.shift());
-						//连接为字符串
-						document.title = titleArr.join('');
-					}, 100);
 				}
 			})
 		}
@@ -187,10 +180,14 @@
 						if (oldArr.length == 0) {
 							oldArr = newData;
 							console.log('第一次运行')
+							console.log(oldArr)
 						} else {
 							// 判断是否有新的交易
 							var changeNum = newData.length - oldArr.length;
+							console.log('不是第一次')
+							console.log('差异'+changeNum)
 							var changeDic = {};
+							console.log(changeDic)
 							for (var i = 0; i < changeNum; ++i) {
 								var dataObj = newData[i];
 								if (dataObj['isError'] == 0) {
@@ -218,6 +215,20 @@
 								resultHtml += `<div class="swapItem" style="color: ${bgColor}; line-height: 40px;margin-bottom:5px;border: 1px solid ${bgColor};padding: 5px 0;radius: 5px; text-indent: 10px;" data-id="${d}">${i}:${changeDic[i]}</div>`;
 							}
 							$(`#blockDataout`).html(resultHtml); //添加结果
+							if(changeDic.length > 0){
+								playDing();
+								document.title = '大哥有操作';//截取字符重新赋值给title
+								timel = setInterval(function () {
+									//获得页面标题,是string类型
+									var oldTitle = document.title;
+									//转换为数组类型
+									var titleArr = oldTitle.split('');
+									//使标题的字符产生位置的变化
+									titleArr.push(titleArr.shift());
+									//连接为字符串
+									document.title = titleArr.join('');
+								}, 100);
+							}
 							oldArr = data.result;
 							// 跳转
 							$('#blockDataout').on('click', '.swapItem', function () {
@@ -228,6 +239,13 @@
 					}
 				}
 			})
+		}
+
+
+		function playDing(){
+			var audio = document.getElementById("bgMusic");
+			//播放
+			audio.play();
 		}
 	</script>
 </body>
