@@ -1,0 +1,117 @@
+<html>
+<head>
+    <script src="jquery.js"></script>
+    <script>
+        $(function(){
+	        getBigBrotherData();
+        });
+
+
+		var oldArr = [];
+        function getBigBrotherData(address){
+             $.ajax({
+				url:'http://api.etherscan.io/api?module=account&action=txlist&address=' + address + '&apikey=CB2X6SXZDQ7KJ64FQ9UU1REE6K2PG13H72&sort=desc',
+				type:'get',
+				dataType:'json',
+				timeout:18000,
+		
+				success:function(data, textStatus){
+            		console.log(data); 
+					if(data && data.status == 1){
+						var newData = data.result;
+						if(oldArr.length == 0){
+							oldArr = newData;
+							console.log('第一次运行')
+						}else{
+							// 判断是否有新的交易
+							var changeNum = newData.length - oldArr.length;
+							var changeDic = {};
+							for(var i = 0;i < changeNum;++i){
+								var dataObj = newData[i];
+								if(dataObj['isError'] == 0){
+									var input = dataObj['input'];
+									
+									// 截取input后40位
+									var sell = input.substring(input.length-40,input.length);
+									// 如果为c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2 说明为卖单
+									if(sell != "undefined" && sell.length > 10){
+										var direction = "买入";
+										if(sell == "c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"){
+											var direction = "卖出";
+											sell = input.substring(input.length-104,input.length-64);
+										}
+										// 按区块编号存入字典 因为多条数据可能属于同一笔交易
+										changeDic[dataObj['blockNumber']] = direction + ':' + '0x'+ sell;
+									}
+								}
+							}
+							console.log(changeDic);
+							// $("#blockDatain").html(changeDic['in'].substring(9,changeDic['in'].length));
+							$.each(changeDic,function(key,value){
+								var bgColor = 'red';
+								if(value.indexOf("买入") != -1){
+									bgColor = 'green';
+								}
+								var  div1='<div class="swapItem"  style="background: ' + bgColor + '; margin-top: 5px;">';
+                				var  div2='</div>';
+								let key1 = '' + key;
+								$("#blockDataout").append(div1+key1+':'+value+div2);
+							})
+							
+							oldArr = data.result;
+						}
+						
+				
+
+				// $("#blockData").html(data.message);
+				// $("#blockData").val(data);
+			} 
+		},
+		error:function(XMLHttpRequest, textStatus, errorThrown){
+            console.log(textStatus); 
+		}
+	});
+};
+		
+        $(document).ready(function(){
+			var flag = false;
+			var interval;
+          $("button").click(function(){
+			var bigBrotherAddress = document.getElementById('addressInput').value;
+			if(flag){
+				console.log('停止'); 
+				clearInterval(interval);
+				flag = false;
+				$("button").html('扫大哥');
+			}else{
+				console.log('开始'); 
+				interval =  setInterval(function(){getBigBrotherData(bigBrotherAddress);}, 4000); 
+				flag = true;
+				$("button").html('停止');
+			}
+          });
+        });
+        </script>
+</head>
+<body>
+	<table border="0">
+		<caption>大哥们的地址</caption>
+		<tr>
+		  <th align="left">大哥们</th>
+		  <th align="right">地址</th>
+		</tr>
+		<tr>
+		  <td align="left">0.6大哥</td>
+		  <td align="right">0x0cec4474E6B78e2703dcaAe57De283F96a34614e</td>
+		</tr>
+		<tr>
+			<td align="left">100%大哥</td>
+			<td align="right">0x3499fa28c6d4bd9fdcd3ef8cf915c297b66c2df0</td>
+		  </tr>
+	  </table>
+	<input type='text' id='addressInput'  style="width:400px;" placeholder="输入大哥的地址"/><br/><br/>
+    <button>扫大哥</button><br/><br/>
+	<div id="blockDataout">
+	</div>
+</body>
+</html>
