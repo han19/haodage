@@ -228,11 +228,7 @@
 								}
 							}
 							oldArr = data.result;
-							// 跳转
-							$('#blockDataout').on('click', '.swapItem', function () {
-								let dataId = $(this).attr('data-id')
-								window.open(`https://etherscan.io/address/${dataId}`)
-							})
+							
 						}
 					}
 
@@ -242,7 +238,11 @@
 			})
 		}
 
-
+                // 跳转
+							$('#blockDataout').on('click', '.swapItem', function () {
+								let dataId = $(this).attr('data-id')
+								window.open(`https://etherscan.io/address/${dataId}`)
+							})
 		document.addEventListener('visibilitychange',function(){
   			var isHidden = document.hidden;
 			pageHidden = isHidden;
